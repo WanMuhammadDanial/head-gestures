@@ -36,7 +36,8 @@ DATA_PATH = os.path.join('MP_Data')
 # Actions that we try to detect
 # possible to record different gestures separately if you want
 # just make sure to label accordingly
-actions = np.array(['neutral'])
+actions = np.array(['tilt left'])
+#actions = np.array(['neutral', 'up', 'down', 'left', 'right', 'tilt left', 'tilt right'])
 
 # Thirty videos worth of data
 no_sequences = 30
@@ -77,7 +78,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 4, cv2.LINE_AA)
                     cv2.putText(image, 'Collecting frames for {} Video Number {}'.format(action, sequence), (15, 12),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
-                    cv2.waitKey(500)
+                    cv2.waitKey(2000)
                 else:
                     print('Collecting frames for {} Video Number {}'.format(action, sequence))
                     cv2.putText(image, 'Collecting frames for {} Video Number {}'.format(action, sequence), (15, 12),
