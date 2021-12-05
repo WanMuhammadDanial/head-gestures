@@ -1,11 +1,9 @@
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
+from tensorflow.keras.optimizers import SGD
 import cv2
 import mediapipe as mp
 import numpy as np
-from matplotlib import pyplot as plt
-import time
-from scipy import stats
 
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
@@ -37,7 +35,7 @@ def extract_keypoints(results_key):
 # make sure to update this with another new dictionary(?) of color values every time you add a new gesture
 # not really necessary but its amusing
 # need to find a way to translate this into the UI thingy
-colors = [(117, 245, 16), (117, 245, 16), (16, 117, 245), (12, 123, 234), (12, 123, 234)]
+colors = [(117, 245, 16), (117, 245, 16), (16, 117, 245), (12, 123, 234), (12, 123, 234), (12, 123, 234), (12, 123, 234)]
 
 
 def prob_viz(res_viz, action_viz, input_frame, color_viz):
@@ -51,14 +49,15 @@ def prob_viz(res_viz, action_viz, input_frame, color_viz):
 
 # make sure to have the same number + type of actions as during training
 # order is important, gesture name doesn't matter here but will definitely help to avoid confusion
-actions = np.array(['neutral', 'up', 'down', 'left', 'right'])
+actions = np.array(['neutral', 'up', 'down', 'left', 'right', 'tilt left', 'tilt right'])
 model = Sequential()
 model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30, 1536)))
-model.add(LSTM(128, return_sequences=True, activation='relu'))
 model.add(LSTM(64, return_sequences=False, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(actions.shape[0], activation='softmax'))
+opt = SGD(lr=0.01, momentum=0.9)
+model.compile(loss='mean_absolute_error', optimizer=opt, metrics=['mse'])
 model.built = True
 model.load_weights('head_gesture.h5')
 model.summary()
