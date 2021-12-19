@@ -35,7 +35,9 @@ def extract_keypoints(results_key):
 # make sure to update this with another new dictionary(?) of color values every time you add a new gesture
 # not really necessary but its amusing
 # need to find a way to translate this into the UI thingy
-colors = [(117, 245, 16), (117, 245, 16), (16, 117, 245), (12, 123, 234), (12, 123, 234), (12, 123, 234), (12, 123, 234)]
+colors = []
+for i in range(8):
+    colors.append((12, 123, 234))
 
 
 def prob_viz(res_viz, action_viz, input_frame, color_viz):
@@ -49,7 +51,7 @@ def prob_viz(res_viz, action_viz, input_frame, color_viz):
 
 # make sure to have the same number + type of actions as during training
 # order is important, gesture name doesn't matter here but will definitely help to avoid confusion
-actions = np.array(['neutral', 'up', 'down', 'left', 'right', 'tilt left', 'tilt right'])
+actions = np.array(['neutral', 'up', 'down', 'left', 'right', 'tilt left', 'tilt right', 'shake head'])
 model = Sequential()
 model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30, 1536)))
 model.add(LSTM(64, return_sequences=False, activation='relu'))
@@ -68,17 +70,19 @@ sentence = []
 predictions = []
 threshold = 0.8
 
+arr_name = ['neutral', 'up', 'down', 'left', 'right', 'tilt left', 'tilt right', 'shake head']
+arr_gesture = [0, 0, 0, 0, 0, 0, 0, 0]
+
 cap = cv2.VideoCapture(0)
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+    fuhpuhs = 0
     while cap.isOpened():
+
         # Read feed
         ret, frame = cap.read()
 
         # Make detections
         image, results = mediapipe_detection(frame, holistic)
-
-        # Draw landmarks
-        draw_landmarks(image, results)
 
         # 2. Prediction logic
         keypoints = extract_keypoints(results)
@@ -91,20 +95,35 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
             # 3. Viz logic
             if res[np.argmax(res)] > threshold:
-                if len(sentence) > 0:
-                    if actions[np.argmax(res)] != sentence[-1]:
-                        sentence.append(actions[np.argmax(res)])
-                else:
-                    sentence.append(actions[np.argmax(res)])
+                arr_index = 0
+                for a in arr_name:
+                    if arr_name[arr_index] == actions[np.argmax(res)]:
+                        arr_gesture[arr_index] += 1
+                        break
+                    arr_index += 1
 
-            if len(sentence) > 5:
-                sentence = sentence[-5:]
+                arr_index = 0
+                for a in arr_gesture:
+                    if a >= 10:
+                        if len(sentence) > 0:
+                            if actions[np.argmax(res)] != sentence[-1]:
+                                sentence.append(actions[np.argmax(res)])
+                        else:
+                            sentence.append(actions[np.argmax(res)])
+
+                        arr_gesture = [0, 0, 0, 0, 0, 0, 0, 0]
+
+                        if len(sentence) > 5:
+                            sentence = sentence[-5:]
+
+                        break
+                    arr_index += 1
 
             # Viz probabilities
             image = prob_viz(res, actions, image, colors)
 
         cv2.rectangle(image, (0, 0), (640, 40), (245, 117, 16), -1)
-        cv2.putText(image, ' '.join(sentence), (3, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(image, ', '.join(sentence), (3, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
         # Show on screen
         cv2.imshow('OpenCV Feed', image)
