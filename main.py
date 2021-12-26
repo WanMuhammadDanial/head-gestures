@@ -36,14 +36,14 @@ DATA_PATH = os.path.join('MP_Data')
 # Actions that we try to detect
 # possible to record different gestures separately if you want
 # just make sure to label accordingly
-actions = np.array(['tilt left', 'tilt right'])
+actions = np.array(['tilt right'])
 #actions = np.array(['neutral', 'up', 'down', 'left', 'right', 'tilt left', 'tilt right', 'shake head'])
 
 # Thirty videos worth of data
 no_sequences = 30
 
 # Videos are going to be 30 frames in length
-sequence_length = 30
+sequence_length = 15
 
 for action in actions:
     for sequence in range(no_sequences):

@@ -53,7 +53,7 @@ def prob_viz(res_viz, action_viz, input_frame, color_viz):
 # order is important, gesture name doesn't matter here but will definitely help to avoid confusion
 actions = np.array(['neutral', 'up', 'down', 'left', 'right', 'tilt left', 'tilt right', 'shake head'])
 model = Sequential()
-model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30, 1536)))
+model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(15, 1536)))
 model.add(LSTM(64, return_sequences=False, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
@@ -84,12 +84,15 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         # Make detections
         image, results = mediapipe_detection(frame, holistic)
 
+        # Draw landmarks
+        draw_landmarks(image, results)
+
         # 2. Prediction logic
         keypoints = extract_keypoints(results)
         sequence.append(keypoints)
-        sequence = sequence[-30:]
+        sequence = sequence[-15:]
 
-        if len(sequence) == 30:
+        if len(sequence) == 15:
             res = model.predict(np.expand_dims(sequence, axis=0))[0]
             print(actions[np.argmax(res)])
 
