@@ -10,7 +10,7 @@ from tensorflow.keras.callbacks import TensorBoard
 DATA_PATH = os.path.join('MP_Data')
 
 # plug in all the gestures you want in actions
-actions = np.array(['neutral', 'up', 'down', 'left', 'right', 'tilt left', 'tilt right', 'shake head'])
+actions = np.array(['neutral', 'up', 'down', 'left', 'right', 'tilt left', 'tilt right'])
 no_sequences = 30
 sequence_length = 15
 label_map = {label: num for num, label in enumerate(actions)}
