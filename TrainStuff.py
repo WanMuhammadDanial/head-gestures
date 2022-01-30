@@ -12,16 +12,18 @@ DATA_PATH = os.path.join('MP_Data')
 # plug in all the gestures you want in actions
 actions = np.array(['neutral', 'up', 'down', 'left', 'right', 'tilt left', 'tilt right'])
 no_sequences = 30
-sequence_length = 30
+sequence_length = 15
 label_map = {label: num for num, label in enumerate(actions)}
 
 sequences, labels = [], []
 for action in actions:
     for sequence in range(no_sequences):
         window = []
+
         for frame_num in range(sequence_length):
             res = np.load(os.path.join(DATA_PATH, action, str(sequence), "{}.npy".format(frame_num)))
             window.append(res)
+
         sequences.append(window)
         labels.append(label_map[action])
 
@@ -32,7 +34,7 @@ print(x.shape)
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1)
 
 model = Sequential()
-model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30, 1536)))
+model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(15, 1536)))
 model.add(LSTM(64, return_sequences=False, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
@@ -43,6 +45,6 @@ model.compile(loss='mean_absolute_error', optimizer=opt, metrics=['mse'])
 
 # not sure if this matters but I usually delete head_gesture.h5 every time before re-training
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-model.fit(x_train, y_train, epochs=250)
+model.fit(x_train, y_train, epochs=100)
 model.summary()
 model.save('head_gesture.h5')
