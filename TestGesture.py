@@ -32,6 +32,30 @@ def extract_keypoints(results_key):
         if results_key.face_landmarks else np.zeros(468*3)
     return np.concatenate([pose_key, face_key])
 
+def reset_combo():
+    global combo
+    combo = []
+
+def storeCombo(gesture):
+    global sentence
+    #avoid error
+    if(len(sentence) > 1):
+        #only store if previous isnt the same
+        if(gesture != sentence[len(sentence)-1]):
+            if((gesture== 'up' or gesture == 'down') and (sentence[len(sentence)-1] == 'up' or sentence[len(sentence)-1] == 'down')):
+                sentence.append('nod')
+                reset_combo()
+            elif ((gesture== 'right' or gesture == 'left') and (sentence[len(sentence)-1] == 'right' or sentence[len(sentence)-1] == 'left')):
+                sentence.append('shake')
+                reset_combo()
+            else:
+                sentence.append(gesture)
+    else:
+        sentence.append(gesture)
+
+
+
+
 
 # make sure to update this with another new dictionary(?) of color values every time you add a new gesture
 # not really necessary but its amusing
@@ -75,6 +99,8 @@ arr_name = ['neutral', 'up', 'down', 'left', 'right', 'tilt left', 'tilt right']
 arr_gesture = [0, 0, 0, 0, 0, 0, 0, 0]
 
 cap = cv2.VideoCapture(0)
+
+combo = []
 
 #set time per recorded gesture in seconds
 sensitivity = 0.0
@@ -120,9 +146,11 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
                         if a >= 10:
                             if len(sentence) > 0:
                                 if actions[np.argmax(res)] != sentence[-1]:
-                                    sentence.append(actions[np.argmax(res)])
+                                    #sentence.append(actions[np.argmax(res)])
+                                    storeCombo(actions[np.argmax(res)])
                             else:
-                                sentence.append(actions[np.argmax(res)])
+                                #sentence.append(actions[np.argmax(res)])
+                                storeCombo(actions[np.argmax(res)])
 
                             arr_gesture = [0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -168,3 +196,5 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
     cap.release()
     cv2.destroyAllWindows()
+
+
