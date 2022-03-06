@@ -33,29 +33,33 @@ def extract_keypoints(results_key):
     return np.concatenate([pose_key, face_key])
 
 def reset_combo():
-    global combo
+    global combo, combo_downtime, combo_timer
     combo = []
+    combo_timer = datetime.datetime.utcnow()
 
 def storeCombo(gesture):
     print('combo to store' + gesture)
-    global sentence
+    global previous_gesture, sentence, combo_downtime, combo_timer
+
     #avoid error
     if(len(sentence) > 1):
         if((gesture== 'up' or gesture == 'down') and (sentence[len(sentence)-1] == 'up' or sentence[len(sentence)-1] == 'down')):
             sentence.append('nod')
+            previous_gesture = 'nod'
             reset_combo()
         elif ((gesture== 'right' or gesture == 'left') and (sentence[len(sentence)-1] == 'right' or sentence[len(sentence)-1] == 'left')):
             sentence.append('shake')
+            previous_gesture = 'shake'
             reset_combo()
         else:
             sentence.append(gesture)
+            previous_gesture = gesture
     else:
         sentence.append(gesture)
+        previous_gesture = gesture
 
 def faceDetectionLogic():
-    global starttime
-    global arr_gesture
-    global sentence
+    global starttime, arr_gesture, sentence
 
     # if len(sentence) > 0:
     #     if actions[np.argmax(res)] != sentence[-1]:
@@ -137,14 +141,18 @@ arr_gesture = [0, 0, 0, 0, 0, 0, 0, 0]
 cap = cv2.VideoCapture(0)
 
 combo = []
+previous_gesture = ''
 
 #set time per recorded gesture in seconds
 sensitivity = 0.0
 sensitivity_interval = 0.5
 starttime = datetime.datetime.utcnow()
-
+#neutral buffer
 neutral_downtime = 2
 neutral_timer = datetime.datetime.utcnow()
+#combo buffer
+combo_downtime = 2
+combo_timer = datetime.datetime.utcnow()
 
 res = np.array([])
 
@@ -172,19 +180,32 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
             if ((datetime.datetime.utcnow() - starttime).total_seconds() > sensitivity):
                 res = model.predict(np.expand_dims(sequence, axis=0))[0]
 
-                #neutral downtime so it does not immediately take neutral when trying to do combo
+                #neutral buffer/downtime so it does not immediately take neutral when trying to do combo
                 if actions[np.argmax(res)] == 'neutral' and ((datetime.datetime.utcnow() - neutral_timer).total_seconds() < neutral_downtime):
                     if((datetime.datetime.utcnow() - neutral_timer).total_seconds()) <= 0:
                         neutral_timer = datetime.datetime.utcnow()
                     print('waiting neutral downtime')
+
                 #if neutral is registered, combo array is reset to start another combo from fresh
                 elif actions[np.argmax(res)] == 'neutral' and ((datetime.datetime.utcnow() - neutral_timer).total_seconds() > neutral_downtime):
                     reset_combo()
                     faceDetectionLogic()
+
+                #not neutral gesure    
                 else:
-                    print(actions[np.argmax(res)])
-                    faceDetectionLogic()
-                   
+                    #do combo buffer/donwtime
+                    if previous_gesture == 'nod' and (actions[np.argmax(res)] =='up' or actions[np.argmax(res)] =='up'):
+                        if ((datetime.datetime.utcnow() - combo_timer).total_seconds() > combo_downtime):
+                            print(actions[np.argmax(res)])
+                            faceDetectionLogic()
+                    elif previous_gesture == 'shake' and (actions[np.argmax(res)] =='right' or actions[np.argmax(res)] =='left'):
+                        if ((datetime.datetime.utcnow() - combo_timer).total_seconds() > combo_downtime):
+                            print(actions[np.argmax(res)])
+                            faceDetectionLogic()
+                    else:
+                        print(actions[np.argmax(res)])
+                        faceDetectionLogic()
+
                     neutral_timer = datetime.datetime.utcnow()
                    
 
