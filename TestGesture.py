@@ -37,21 +37,57 @@ def reset_combo():
     combo = []
 
 def storeCombo(gesture):
+    print('combo to store' + gesture)
     global sentence
     #avoid error
     if(len(sentence) > 1):
-        #only store if previous isnt the same
-        if(gesture != sentence[len(sentence)-1]):
-            if((gesture== 'up' or gesture == 'down') and (sentence[len(sentence)-1] == 'up' or sentence[len(sentence)-1] == 'down')):
-                sentence.append('nod')
-                reset_combo()
-            elif ((gesture== 'right' or gesture == 'left') and (sentence[len(sentence)-1] == 'right' or sentence[len(sentence)-1] == 'left')):
-                sentence.append('shake')
-                reset_combo()
-            else:
-                sentence.append(gesture)
+        if((gesture== 'up' or gesture == 'down') and (sentence[len(sentence)-1] == 'up' or sentence[len(sentence)-1] == 'down')):
+            sentence.append('nod')
+            reset_combo()
+        elif ((gesture== 'right' or gesture == 'left') and (sentence[len(sentence)-1] == 'right' or sentence[len(sentence)-1] == 'left')):
+            sentence.append('shake')
+            reset_combo()
+        else:
+            sentence.append(gesture)
     else:
         sentence.append(gesture)
+
+def faceDetectionLogic():
+    global starttime
+    global arr_gesture
+    global sentence
+
+    # if len(sentence) > 0:
+    #     if actions[np.argmax(res)] != sentence[-1]:
+    #         storeCombo(actions[np.argmax(res)])
+    # 3. Viz logic
+    if res[np.argmax(res)] > threshold:
+        arr_index = 0
+        for a in arr_name:
+            if arr_name[arr_index] == actions[np.argmax(res)]:
+                arr_gesture[arr_index] += 1
+                break
+            arr_index += 1
+
+        arr_index = 0
+        for a in arr_gesture:
+            if a >= 10:
+                if len(sentence) > 0:
+                    if actions[np.argmax(res)] != sentence[-1]:
+                        #sentence.append(actions[np.argmax(res)])
+                        storeCombo(actions[np.argmax(res)])
+                else:
+                    #sentence.append(actions[np.argmax(res)])
+                    storeCombo(actions[np.argmax(res)])
+
+                arr_gesture = [0, 0, 0, 0, 0, 0, 0, 0]
+
+                if len(sentence) > 5:
+                    sentence = sentence[-5:]
+
+                break
+            arr_index += 1
+        starttime = datetime.datetime.utcnow()
 
 
 
@@ -106,6 +142,10 @@ combo = []
 sensitivity = 0.0
 sensitivity_interval = 0.5
 starttime = datetime.datetime.utcnow()
+
+neutral_downtime = 2
+neutral_timer = datetime.datetime.utcnow()
+
 res = np.array([])
 
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
@@ -131,35 +171,22 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
             if ((datetime.datetime.utcnow() - starttime).total_seconds() > sensitivity):
                 res = model.predict(np.expand_dims(sequence, axis=0))[0]
-                print(actions[np.argmax(res)])
-                # 3. Viz logic
-                if res[np.argmax(res)] > threshold:
-                    arr_index = 0
-                    for a in arr_name:
-                        if arr_name[arr_index] == actions[np.argmax(res)]:
-                            arr_gesture[arr_index] += 1
-                            break
-                        arr_index += 1
 
-                    arr_index = 0
-                    for a in arr_gesture:
-                        if a >= 10:
-                            if len(sentence) > 0:
-                                if actions[np.argmax(res)] != sentence[-1]:
-                                    #sentence.append(actions[np.argmax(res)])
-                                    storeCombo(actions[np.argmax(res)])
-                            else:
-                                #sentence.append(actions[np.argmax(res)])
-                                storeCombo(actions[np.argmax(res)])
-
-                            arr_gesture = [0, 0, 0, 0, 0, 0, 0, 0]
-
-                            if len(sentence) > 5:
-                                sentence = sentence[-5:]
-
-                            break
-                        arr_index += 1
-                    starttime = datetime.datetime.utcnow()
+                #neutral downtime so it does not immediately take neutral when trying to do combo
+                if actions[np.argmax(res)] == 'neutral' and ((datetime.datetime.utcnow() - neutral_timer).total_seconds() < neutral_downtime):
+                    if((datetime.datetime.utcnow() - neutral_timer).total_seconds()) <= 0:
+                        neutral_timer = datetime.datetime.utcnow()
+                    print('waiting neutral downtime')
+                #if neutral is registered, combo array is reset to start another combo from fresh
+                elif actions[np.argmax(res)] == 'neutral' and ((datetime.datetime.utcnow() - neutral_timer).total_seconds() > neutral_downtime):
+                    reset_combo()
+                    faceDetectionLogic()
+                else:
+                    print(actions[np.argmax(res)])
+                    faceDetectionLogic()
+                   
+                    neutral_timer = datetime.datetime.utcnow()
+                   
 
 
 
