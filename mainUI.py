@@ -101,11 +101,13 @@ dpg.create_context()
 
 with dpg.window(label="Example Window", width=300):
     dpg.add_text("Main Menu")
-    dpg.add_button(label="Living Room")
+    with dpg.group(width = 100):
+        dpg.add_button(label="Living Room")
     with dpg.group(horizontal = True):
         dpg.add_button(label="Kitchen")
         dpg.add_button(label="Toilet")
-    dpg.add_button(label="Master Bedroom")
+    with dpg.group(width = 100):
+        dpg.add_button(label="Master Bedroom")
     # dpg.add_input_text(label="string", default_value="Quick brown fox")
     # dpg.add_slider_float(label="float", default_value=0.273, max_value=1)
 
