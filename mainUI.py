@@ -159,14 +159,14 @@ with dpg.window(label="Example Window", width=300):
                                 dpg.add_button(label=f"{right_btn}")
                             elif(i == 4 and j == 1):
                                 dpg.add_button(label=f"{bottom_btn}")
-                        else:
+                        elif():
                             if(i == 0 and j == 1):
                                 dpg.add_button(label=f"{top_btn}")
                             elif(i == 1 and j == 0):
                                 dpg.add_button(label=f"{left_btn}")
-                            elif(i == 2 and j == 2):
+                            elif(i == 1 and j == 2):
                                 dpg.add_button(label=f"{right_btn}")
-                            elif(i == 4 and j == 1):
+                            elif(i == 2 and j == 1):
                                 dpg.add_button(label=f"{bottom_btn}")
                         
                         # dpg.add_button(label=f"Row{i} Column{j} a")
