@@ -89,7 +89,6 @@ def update_button_names(top,right,bottom,left):
 def reset_data():
     global buttons
     global room 
-    # roomTitle.set("Initial text")
     update_top_text('Main Menu')
     room = 1
     # 0 = top, 1 = left, 2 = right, 3 = bottom
@@ -113,7 +112,7 @@ window.title("Head Gesture")
 top_text = tk.Label(window, font=("Arial", 16), justify="center", anchor="center")
 top_text.grid(row=0, column=1)
 
-bottom_text = tk.Label(window, font=("Arial", 12), justify="center", anchor="center")
+bottom_text = tk.Label(window,text= 'Number of switched on Appliance: 0', font=("Arial", 12), justify="center", anchor="center")
 bottom_text.grid(row=4, column=1)
 
 reset_data()
