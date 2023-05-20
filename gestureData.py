@@ -6,35 +6,28 @@ firstPageData = [
 ]
 
 secondPageData = {
-    'Living Room': 'Appliences',
-    'Kitchen': ['a', 'b', 'c'],
-    'Bedroom': ['a', 'b', 'c'],
-    'Toilet': [True, False]
-}
-
-secondPageData = {
     'Living Room': {
-        'fan': 0,
-        'tv':0,
-        'window': 0,
-        'light': 0,
+        'fan': 'off',
+        'light':'off',
+        'cancel': '',
+        'window': 'off',
     },
     'Kitchen': {
-        'fan': 0,
-        'tv':0,
-        'window': 0,
-        'light': 0,
+        'fan': 'off',
+        'light':'off',
+        'cancel': '',
+        'window': 'off',
     },
     'Bedroom': {
-        'fan': 0,
-        'tv':0,
-        'window': 0,
-        'light': 0,
+        'fan': 'off',
+        'light':'off',
+        'cancel': '',
+        'window': 'off',
     },
     'Toilet': {
-        'fan': 0,
-        'tv':0,
-        'window': 0,
-        'light': 0,
+        'fan': 'off',
+        'light':'off',
+        'cancel': '',
+        'window': 'off',
     }
 }
