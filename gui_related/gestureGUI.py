@@ -178,31 +178,33 @@ top_text.grid(row=0, column=1)
 bottom_text = tk.Label(window,text= f'{totalOnAppliancesText}0', font=("Arial", 12), justify="center", anchor="center")
 bottom_text.grid(row=4, column=1)
 
-for i in range(5):
-    window.grid_rowconfigure(i, minsize=10)  
-    window.grid_columnconfigure(i, minsize=10)  
+def start_GUI():
+    global window, buttons
+    for i in range(5):
+        window.grid_rowconfigure(i, minsize=10)  
+        window.grid_columnconfigure(i, minsize=10)  
 
 
-    for j in range(3):
-        frame = tk.Frame(
-            master=window,
-            relief=tk.RAISED,
-            borderwidth=1
-        )
-        frame.grid(row=i, column=j, padx=10, pady=10)
-
-        # if(i == 0 and j == 1):
-            
-
-        if (i, j) in [(1, 1), (2, 0), (2, 2), (3, 1)]:
-            button = tk.Button(
-                master=frame,
-                text=data[i][j],  
-                command=lambda row=i, col=j: button_click(row, col)
+        for j in range(3):
+            frame = tk.Frame(
+                master=window,
+                relief=tk.RAISED,
+                borderwidth=1
             )
-            button.pack(fill=tk.BOTH, expand=True)
-            buttons.append(button)
+            frame.grid(row=i, column=j, padx=10, pady=10)
 
-reset_data()
+            # if(i == 0 and j == 1):
+                
 
-window.mainloop()
+            if (i, j) in [(1, 1), (2, 0), (2, 2), (3, 1)]:
+                button = tk.Button(
+                    master=frame,
+                    text=data[i][j],  
+                    command=lambda row=i, col=j: button_click(row, col)
+                )
+                button.pack(fill=tk.BOTH, expand=True)
+                buttons.append(button)
+
+    reset_data()
+
+    window.mainloop()
