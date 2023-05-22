@@ -124,10 +124,6 @@ def update_all_button_names(top,v_top,right,v_right,bottom,v_bottom,left,v_left)
     l_color = lightGreen if v_left == 'on' else lightGrey
     # 0 = top, 1 = left, 2 = right, 3 = bottom
     for counter, button in enumerate(buttons, start=0):
-        # if(counter == 0 ): button.configure(text=f"{top}: {v_top}")
-        # if(counter == 2 ): button.configure(text=f"{right}: {v_right}")
-        # if(counter == 3 ): button.configure(text=f"{bottom}")
-        # if(counter == 1 ): button.configure(text=f"{left}: {v_left}")
         if(counter == 0 ): button.configure(text=f"{top}: {v_top}", bg=t_color)
         if(counter == 2 ): button.configure(text=f"{right}: {v_right}", bg=r_color)
         if(counter == 3 ): button.configure(text=f"{bottom}", bg=b_color)
