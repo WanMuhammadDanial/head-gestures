@@ -164,20 +164,7 @@ def button_click(row, col):
                 secondRoomNames[roomTitle][data[row][col]] = 'off'
                 update_button_status(row,col,data[row][col],secondRoomNames[roomTitle][data[row][col]])
                 switchOff()
-
-#================================================== Function Initialization END ==================================================
-
-#================================================== Code Execution START ==================================================
-
-window = tk.Tk()
-window.title("Head Gesture") 
-
-top_text = tk.Label(window, font=("Arial", 16), justify="center", anchor="center")
-top_text.grid(row=0, column=1)
-
-bottom_text = tk.Label(window,text= f'{totalOnAppliancesText}0', font=("Arial", 12), justify="center", anchor="center")
-bottom_text.grid(row=4, column=1)
-
+                
 def start_GUI():
     global window, buttons
     for i in range(5):
@@ -208,3 +195,17 @@ def start_GUI():
     reset_data()
 
     window.mainloop()
+#================================================== Function Initialization END ==================================================
+
+#================================================== Code Execution START ==================================================
+
+window = tk.Tk()
+window.title("Head Gesture") 
+
+top_text = tk.Label(window, font=("Arial", 16), justify="center", anchor="center")
+top_text.grid(row=0, column=1)
+
+bottom_text = tk.Label(window,text= f'{totalOnAppliancesText}0', font=("Arial", 12), justify="center", anchor="center")
+bottom_text.grid(row=4, column=1)
+
+
