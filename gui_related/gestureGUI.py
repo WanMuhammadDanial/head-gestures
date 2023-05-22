@@ -181,17 +181,13 @@ def start_GUI():
         window.grid_rowconfigure(i, minsize=10)  
         window.grid_columnconfigure(i, minsize=10)  
 
-
         for j in range(3):
             frame = tk.Frame(
                 master=window,
                 relief=tk.RAISED,
                 borderwidth=1
             )
-            frame.grid(row=i, column=j, padx=10, pady=10)
-
-            # if(i == 0 and j == 1):
-                
+            frame.grid(row=i, column=j, padx=10, pady=10)  
 
             if (i, j) in [(1, 1), (2, 0), (2, 2), (3, 1)]:
                 button = tk.Button(
