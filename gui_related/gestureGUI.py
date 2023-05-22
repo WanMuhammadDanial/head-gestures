@@ -92,7 +92,7 @@ def update_button_names(top,v_top,right,v_right,bottom,v_bottom,left,v_left):
     for counter, button in enumerate(buttons, start=0):
         if(counter == 0 ): button.configure(text=f"{top}: {v_top}")
         if(counter == 2 ): button.configure(text=f"{right}: {v_right}")
-        if(counter == 3 ): button.configure(text=f"{bottom}: {v_bottom}")
+        if(counter == 3 ): button.configure(text=f"{bottom}")
         if(counter == 1 ): button.configure(text=f"{left}: {v_left}")
 
 def reset_data():
