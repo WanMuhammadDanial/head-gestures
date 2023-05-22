@@ -23,8 +23,10 @@ secondRoomValues = [] # status of the appliances in the room
 
 #--Colors
 lightGreen = '#98fb98'
-lightRed = '#ff726f'
 lightGrey = '#f0f0f0'
+
+#--Text
+totalOnAppliancesText = 'Number of switched on Appliances: '
 
 #================================================== Variable Initialization END ==================================================
 
@@ -73,7 +75,7 @@ def update_top_text(new_text):
 
 def update_bottom_text():
     global switchedOnAppl
-    new_text = f"Number of switched on Appliance: {switchedOnAppl}"
+    new_text = f"{totalOnAppliancesText}{switchedOnAppl}"
     bottom_text.config(text=new_text)
 
 def access_second_page(data):
@@ -173,7 +175,7 @@ window.title("Head Gesture")
 top_text = tk.Label(window, font=("Arial", 16), justify="center", anchor="center")
 top_text.grid(row=0, column=1)
 
-bottom_text = tk.Label(window,text= 'Number of switched on Appliance: 0', font=("Arial", 12), justify="center", anchor="center")
+bottom_text = tk.Label(window,text= f'{totalOnAppliancesText}0', font=("Arial", 12), justify="center", anchor="center")
 bottom_text.grid(row=4, column=1)
 
 for i in range(5):
