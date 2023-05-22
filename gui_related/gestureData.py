@@ -9,25 +9,25 @@ secondPageData = {
     'Living Room': {
         'fan': 'off',
         'light':'off',
-        'cancel': '',
+        'back': '',
         'window': 'off',
     },
     'Kitchen': {
         'fan': 'off',
         'light':'off',
-        'cancel': '',
+        'back': '',
         'window': 'off',
     },
     'Bedroom': {
         'fan': 'off',
         'light':'off',
-        'cancel': '',
+        'back': '',
         'window': 'off',
     },
     'Toilet': {
         'fan': 'off',
         'light':'off',
-        'cancel': '',
+        'back': '',
         'window': 'off',
     }
 }

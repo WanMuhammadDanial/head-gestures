@@ -10,6 +10,7 @@ data = [
     ['', '', ''],
     ['', '', '']
 ]
+
 buttons = [] # 0 = top, 1 = left, 2 = right, 3 = bottom
 room = 1 # current room 1 or 2
 switchedOnAppl = 0 # total number of appliances that are currently switched on
@@ -19,6 +20,11 @@ firstRoomItemsArray = list(gd.firstPageData.keys())
 secondRoomNames = gd.secondPageData # list of rooms along with their items
 secondRoomItems = [] # appliances in the room
 secondRoomValues = [] # status of the appliances in the room
+
+#--Colors
+lightGreen = '#98fb98'
+lightRed = '#ff726f'
+lightGrey = '#f0f0f0'
 
 #================================================== Variable Initialization END ==================================================
 
@@ -95,11 +101,13 @@ def update_second_page():
     global room,secondRoomNames, secondRoomItems, secondRoomValues
 
 def update_button_status(row, col, item, status):
+    bg = lightGrey
+    if(status == 'on'): bg=lightGreen
     if(room == 2):
-        if(row == 1 and col == 1): buttons[0].configure(text=f"{item}: {status}")
-        elif(row == 2 and col == 2 ): buttons[2].configure(text=f"{item}: {status}")
+        if(row == 1 and col == 1): buttons[0].configure(text=f"{item}: {status}", bg=bg)
+        elif(row == 2 and col == 2 ): buttons[2].configure(text=f"{item}: {status}", bg=bg)
         elif(row == 3 and col == 1 ): buttons[3].configure(text=f"{item}")
-        elif(row == 2 and col == 0 ): buttons[1].configure(text=f"{item}: {status}")
+        elif(row == 2 and col == 0 ): buttons[1].configure(text=f"{item}: {status}", bg=bg)
 
 
 def update_all_button_names(top,v_top,right,v_right,bottom,v_bottom,left,v_left):
@@ -109,12 +117,21 @@ def update_all_button_names(top,v_top,right,v_right,bottom,v_bottom,left,v_left)
     set_right_data(right)
     set_bottom_data(bottom)
     set_left_data(left)
+    # always grey because it always represents back button (no status) on second page 
+    b_color = lightGrey
+    t_color = lightGreen if v_top == 'on' else lightGrey
+    r_color = lightGreen if v_right == 'on' else lightGrey
+    l_color = lightGreen if v_left == 'on' else lightGrey
     # 0 = top, 1 = left, 2 = right, 3 = bottom
     for counter, button in enumerate(buttons, start=0):
-        if(counter == 0 ): button.configure(text=f"{top}: {v_top}")
-        if(counter == 2 ): button.configure(text=f"{right}: {v_right}")
-        if(counter == 3 ): button.configure(text=f"{bottom}")
-        if(counter == 1 ): button.configure(text=f"{left}: {v_left}")
+        # if(counter == 0 ): button.configure(text=f"{top}: {v_top}")
+        # if(counter == 2 ): button.configure(text=f"{right}: {v_right}")
+        # if(counter == 3 ): button.configure(text=f"{bottom}")
+        # if(counter == 1 ): button.configure(text=f"{left}: {v_left}")
+        if(counter == 0 ): button.configure(text=f"{top}: {v_top}", bg=t_color)
+        if(counter == 2 ): button.configure(text=f"{right}: {v_right}", bg=r_color)
+        if(counter == 3 ): button.configure(text=f"{bottom}", bg=b_color)
+        if(counter == 1 ): button.configure(text=f"{left}: {v_left}", bg=l_color)
 
 def reset_data():
     global buttons
@@ -130,14 +147,15 @@ def reset_data():
     set_bottom_data(firstRoomItemsArray[3])
     set_left_data(firstRoomItemsArray[1])
     for counter, button in enumerate(buttons, start=0):
-        button.configure(text=f"{firstRoomItemsArray[counter]}: {firstRoomItemsFull[firstRoomItemsArray[counter]]}")
+        if(firstRoomItemsFull[firstRoomItemsArray[counter]] <= 0): button.configure(text=f"{firstRoomItemsArray[counter]}: {firstRoomItemsFull[firstRoomItemsArray[counter]]}", bg=lightGrey)
+        elif(firstRoomItemsFull[firstRoomItemsArray[counter]] > 0): button.configure(text=f"{firstRoomItemsArray[counter]}: {firstRoomItemsFull[firstRoomItemsArray[counter]]}", bg=lightGreen)
 
 def button_click(row, col):
     global data, secondRoomNames
     if (room == 1):
         access_second_page(data[row][col])
     elif (room == 2):
-        if(data[row][col]=='cancel'):
+        if(data[row][col]=='back'):
             reset_data()
         else:
             if(secondRoomNames[roomTitle][data[row][col]] == 'off'):
