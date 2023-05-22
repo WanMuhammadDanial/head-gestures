@@ -10,7 +10,7 @@ data = [
     ['', '', ''],
     ['', '', '']
 ]
-buttons = []
+buttons = [] # 0 = top, 1 = left, 2 = right, 3 = bottom
 room = 1
 switchedOnAppl = 0
 roomTitle = ''
@@ -24,15 +24,15 @@ secondRoomValues = []
 def set_top_data(item):
     global data
     data[1][1] = item
-def set_left_data(item):
-    global data
-    data[2][0] = item
-def set_bottom_data(item):
-    global data
-    data[3][1] = item
 def set_right_data(item):
     global data
     data[2][2] = item
+def set_bottom_data(item):
+    global data
+    data[3][1] = item
+def set_left_data(item):
+    global data
+    data[2][0] = item
 
 def close_window():
     window.destroy()
@@ -66,7 +66,7 @@ def access_second_page(data):
     for key, value in secondRoomData.items():
         secondRoomItems.append(key)
         secondRoomValues.append(value)
-    update_button_names(
+    update_all_button_names(
         secondRoomItems[0],
         secondRoomValues[0],
         secondRoomItems[1],
@@ -81,7 +81,15 @@ def access_second_page(data):
 def update_second_page():
     global room,secondRoomNames, secondRoomItems, secondRoomValues
 
-def update_button_names(top,v_top,right,v_right,bottom,v_bottom,left,v_left):
+def update_button_status(row, col, item, status):
+    if(room == 2):
+        if(row == 1 and col == 1): buttons[0].configure(text=f"{item}: {status}")
+        elif(row == 2 and col == 2 ): buttons[2].configure(text=f"{item}: {status}")
+        elif(row == 3 and col == 1 ): buttons[3].configure(text=f"{item}: {status}")
+        elif(row == 2 and col == 0 ): buttons[1].configure(text=f"{item}: {status}")
+
+
+def update_all_button_names(top,v_top,right,v_right,bottom,v_bottom,left,v_left):
     global buttons
     global data
     set_top_data(top)
@@ -115,17 +123,18 @@ def button_click(row, col):
     global data, secondRoomNames
     if (room == 1):
         access_second_page(data[row][col])
-        
     elif (room == 2):
         if(data[row][col]=='cancel'):
             reset_data()
         else:
             if(secondRoomNames[roomTitle][data[row][col]] == 'off'):
-                switchOn()
                 secondRoomNames[roomTitle][data[row][col]] = 'on'
+                update_button_status(row,col,data[row][col],secondRoomNames[roomTitle][data[row][col]])
+                switchOn()
             elif(secondRoomNames[roomTitle][data[row][col]] == 'on'):
-                switchOff()
                 secondRoomNames[roomTitle][data[row][col]] = 'off'
+                update_button_status(row,col,data[row][col],secondRoomNames[roomTitle][data[row][col]])
+                switchOff()
 
 #================================================== Function Initialization END ==================================================
 
