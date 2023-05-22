@@ -5,6 +5,13 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import datetime
+import sys
+
+sys.path.append('gui_related')
+import gestureGUI as gui
+
+#gui.start_GUI()
+
 
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
