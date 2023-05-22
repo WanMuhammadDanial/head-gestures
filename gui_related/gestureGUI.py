@@ -14,77 +14,86 @@ buttons = []
 room = 1
 switchedOnAppl = 0
 roomTitle = ''
+secondRoomNames = gd.secondPageData
+secondRoomItems = []
+secondRoomValues = []
+
 #================================================== Variable Initialization END ==================================================
 
 #================================================== Function Initialization START ==================================================
-def fill_top_data(item):
+def set_top_data(item):
     global data
     data[1][1] = item
-def fill_left_data(item):
+def set_left_data(item):
     global data
     data[2][0] = item
-def fill_bottom_data(item):
+def set_bottom_data(item):
     global data
     data[3][1] = item
-def fill_right_data(item):
+def set_right_data(item):
     global data
     data[2][2] = item
 
 def close_window():
     window.destroy()
 
-def switchOnAppl():
+def switchOn():
     global switchedOnAppl
     switchedOnAppl = switchedOnAppl + 1
+    update_bottom_text()
 
-def switchOffAppl():
+def switchOff():
     global switchedOnAppl
     if(switchedOnAppl > 0): switchedOnAppl = switchedOnAppl - 1
-
-def button_click(row, col):
-    global data
-    if (room == 1):
-        access_second_page(data[row][col])
-    if (room == 2):
-        if(data[row][col]=='cancel'):
-            reset_data()
-        # else:
+    update_bottom_text()
 
 def update_top_text(new_text):
+    global roomTitle
+    roomTitle = new_text
     top_text.config(text=new_text)
 
-def update_bottom_text(new_text):
+def update_bottom_text():
+    global switchedOnAppl
+    new_text = f"Number of switched on Appliance: {switchedOnAppl}"
     bottom_text.config(text=new_text)
 
 def access_second_page(data):
-    global room
+    global room,secondRoomNames, secondRoomItems, secondRoomValues
     update_top_text(data)
-    room = 2
-
-    secondRoomData = gd.secondPageData[data]
-    secondRoomItems = []
+    
+    secondRoomData = secondRoomNames[data]
+    
     for key, value in secondRoomData.items():
         secondRoomItems.append(key)
+        secondRoomValues.append(value)
     update_button_names(
         secondRoomItems[0],
+        secondRoomValues[0],
         secondRoomItems[1],
+        secondRoomValues[1],
         secondRoomItems[2],
+        secondRoomValues[2],
         secondRoomItems[3],
+        secondRoomValues[3],
         )
+    room = 2
 
-def update_button_names(top,right,bottom,left):
+def update_second_page():
+    global room,secondRoomNames, secondRoomItems, secondRoomValues
+
+def update_button_names(top,v_top,right,v_right,bottom,v_bottom,left,v_left):
     global buttons
     global data
-    fill_top_data(top)
-    fill_right_data(right)
-    fill_bottom_data(bottom)
-    fill_left_data(left)
+    set_top_data(top)
+    set_right_data(right)
+    set_bottom_data(bottom)
+    set_left_data(left)
     # 0 = top, 1 = left, 2 = right, 3 = bottom
     for counter, button in enumerate(buttons, start=0):
-        if(counter == 0 ): button.configure(text=top)
-        if(counter == 2 ): button.configure(text=right)
-        if(counter == 3 ): button.configure(text=bottom)
-        if(counter == 1 ): button.configure(text=left)
+        if(counter == 0 ): button.configure(text=f"{top}: {v_top}")
+        if(counter == 2 ): button.configure(text=f"{right}: {v_right}")
+        if(counter == 3 ): button.configure(text=f"{bottom}: {v_bottom}")
+        if(counter == 1 ): button.configure(text=f"{left}: {v_left}")
 
 def reset_data():
     global buttons
@@ -92,15 +101,31 @@ def reset_data():
     update_top_text('Main Menu')
     room = 1
     # 0 = top, 1 = left, 2 = right, 3 = bottom
-    fill_top_data(gd.firstPageData[0])
-    fill_right_data(gd.firstPageData[1])
-    fill_bottom_data(gd.firstPageData[2])
-    fill_left_data(gd.firstPageData[3])
+    set_top_data(gd.firstPageData[0])
+    set_right_data(gd.firstPageData[1])
+    set_bottom_data(gd.firstPageData[2])
+    set_left_data(gd.firstPageData[3])
     for counter, button in enumerate(buttons, start=0):
         if(counter == 0 ): button.configure(text=gd.firstPageData[0])
         if(counter == 2 ): button.configure(text=gd.firstPageData[1])
         if(counter == 3 ): button.configure(text=gd.firstPageData[2])
         if(counter == 1 ): button.configure(text=gd.firstPageData[3])
+
+def button_click(row, col):
+    global data, secondRoomNames
+    if (room == 1):
+        access_second_page(data[row][col])
+        
+    elif (room == 2):
+        if(data[row][col]=='cancel'):
+            reset_data()
+        else:
+            if(secondRoomNames[roomTitle][data[row][col]] == 'off'):
+                switchOn()
+                secondRoomNames[roomTitle][data[row][col]] = 'on'
+            elif(secondRoomNames[roomTitle][data[row][col]] == 'on'):
+                switchOff()
+                secondRoomNames[roomTitle][data[row][col]] = 'off'
 
 #================================================== Function Initialization END ==================================================
 
@@ -114,8 +139,6 @@ top_text.grid(row=0, column=1)
 
 bottom_text = tk.Label(window,text= 'Number of switched on Appliance: 0', font=("Arial", 12), justify="center", anchor="center")
 bottom_text.grid(row=4, column=1)
-
-reset_data()
 
 for i in range(5):
     window.grid_rowconfigure(i, minsize=10)  
