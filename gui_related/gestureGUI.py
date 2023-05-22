@@ -11,16 +11,25 @@ data = [
     ['', '', '']
 ]
 buttons = [] # 0 = top, 1 = left, 2 = right, 3 = bottom
-room = 1
-switchedOnAppl = 0
-roomTitle = ''
-secondRoomNames = gd.secondPageData
-secondRoomItems = []
-secondRoomValues = []
+room = 1 # current room 1 or 2
+switchedOnAppl = 0 # total number of appliances that are currently switched on
+roomTitle = '' # the name of the current room 
+secondRoomNames = gd.secondPageData # list of rooms along with their items
+secondRoomItems = [] # appliances in the room
+secondRoomValues = [] # status of the appliances in the room
 
 #================================================== Variable Initialization END ==================================================
 
 #================================================== Function Initialization START ==================================================
+def printSecondRoom():
+    global secondRoomNames, secondRoomItems, secondRoomValues
+    print('\n=========secondRoomNames=============')
+    print(secondRoomNames)
+    print('\n=========secondRoomItems=============')
+    print(secondRoomItems)
+    print('\n=========secondRoomValues=============')
+    print(secondRoomValues)
+
 def set_top_data(item):
     global data
     data[1][1] = item
@@ -62,7 +71,7 @@ def access_second_page(data):
     update_top_text(data)
     
     secondRoomData = secondRoomNames[data]
-    
+
     for key, value in secondRoomData.items():
         secondRoomItems.append(key)
         secondRoomValues.append(value)
@@ -85,7 +94,7 @@ def update_button_status(row, col, item, status):
     if(room == 2):
         if(row == 1 and col == 1): buttons[0].configure(text=f"{item}: {status}")
         elif(row == 2 and col == 2 ): buttons[2].configure(text=f"{item}: {status}")
-        elif(row == 3 and col == 1 ): buttons[3].configure(text=f"{item}: {status}")
+        elif(row == 3 and col == 1 ): buttons[3].configure(text=f"{item}")
         elif(row == 2 and col == 0 ): buttons[1].configure(text=f"{item}: {status}")
 
 
@@ -106,6 +115,9 @@ def update_all_button_names(top,v_top,right,v_right,bottom,v_bottom,left,v_left)
 def reset_data():
     global buttons
     global room 
+    global secondRoomItems, secondRoomValues
+    secondRoomItems = []
+    secondRoomValues = []
     update_top_text('Main Menu')
     room = 1
     # 0 = top, 1 = left, 2 = right, 3 = bottom
