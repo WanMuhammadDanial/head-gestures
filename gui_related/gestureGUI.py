@@ -130,10 +130,6 @@ def reset_data():
     set_bottom_data(firstRoomItemsArray[2])
     set_left_data(firstRoomItemsArray[3])
     for counter, button in enumerate(buttons, start=0):
-        # if(counter == 0 ): button.configure(text=firstRoomItemsArray[counter])
-        # if(counter == 2 ): button.configure(text=firstRoomItemsArray[counter])
-        # if(counter == 3 ): button.configure(text=firstRoomItemsArray[counter])
-        # if(counter == 1 ): button.configure(text=firstRoomItemsArray[counter])
         button.configure(text=f"{firstRoomItemsArray[counter]}: {firstRoomItemsFull[firstRoomItemsArray[counter]]}")
 
 def button_click(row, col):
@@ -179,9 +175,6 @@ for i in range(5):
         )
         frame.grid(row=i, column=j, padx=10, pady=10)
 
-        # if(i == 0 and j == 1):
-            
-
         if (i, j) in [(1, 1), (2, 0), (2, 2), (3, 1)]:
             button = tk.Button(
                 master=frame,
@@ -193,5 +186,4 @@ for i in range(5):
 
 reset_data()
 
-# Start the Tkinter event loop
 window.mainloop()
