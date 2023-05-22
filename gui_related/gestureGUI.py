@@ -126,9 +126,9 @@ def reset_data():
     room = 1
     # 0 = top, 1 = left, 2 = right, 3 = bottom
     set_top_data(firstRoomItemsArray[0])
-    set_right_data(firstRoomItemsArray[1])
-    set_bottom_data(firstRoomItemsArray[2])
-    set_left_data(firstRoomItemsArray[3])
+    set_right_data(firstRoomItemsArray[2])
+    set_bottom_data(firstRoomItemsArray[3])
+    set_left_data(firstRoomItemsArray[1])
     for counter, button in enumerate(buttons, start=0):
         button.configure(text=f"{firstRoomItemsArray[counter]}: {firstRoomItemsFull[firstRoomItemsArray[counter]]}")
 
@@ -174,6 +174,9 @@ for i in range(5):
             borderwidth=1
         )
         frame.grid(row=i, column=j, padx=10, pady=10)
+
+        # if(i == 0 and j == 1):
+            
 
         if (i, j) in [(1, 1), (2, 0), (2, 2), (3, 1)]:
             button = tk.Button(
