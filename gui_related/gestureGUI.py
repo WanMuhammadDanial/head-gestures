@@ -28,6 +28,16 @@ lightGrey = '#f0f0f0'
 #--Text
 totalOnAppliancesText = 'Number of switched on Appliances: '
 
+#--Gui
+window = tk.Tk()
+window.title("Head Gesture") 
+
+top_text = tk.Label(window, font=("Arial", 16), justify="center", anchor="center")
+top_text.grid(row=0, column=1)
+
+bottom_text = tk.Label(window,text= f'{totalOnAppliancesText}0', font=("Arial", 12), justify="center", anchor="center")
+bottom_text.grid(row=4, column=1)
+
 #================================================== Variable Initialization END ==================================================
 
 #================================================== Function Initialization START ==================================================
@@ -199,13 +209,6 @@ def start_GUI():
 
 #================================================== Code Execution START ==================================================
 
-window = tk.Tk()
-window.title("Head Gesture") 
-
-top_text = tk.Label(window, font=("Arial", 16), justify="center", anchor="center")
-top_text.grid(row=0, column=1)
-
-bottom_text = tk.Label(window,text= f'{totalOnAppliancesText}0', font=("Arial", 12), justify="center", anchor="center")
-bottom_text.grid(row=4, column=1)
+#start_GUI()
 
 
