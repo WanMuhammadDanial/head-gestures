@@ -14,6 +14,8 @@ buttons = [] # 0 = top, 1 = left, 2 = right, 3 = bottom
 room = 1 # current room 1 or 2
 switchedOnAppl = 0 # total number of appliances that are currently switched on
 roomTitle = '' # the name of the current room 
+firstRoomItemsFull = gd.firstPageData
+firstRoomItemsArray = list(gd.firstPageData.keys())
 secondRoomNames = gd.secondPageData # list of rooms along with their items
 secondRoomItems = [] # appliances in the room
 secondRoomValues = [] # status of the appliances in the room
@@ -47,13 +49,15 @@ def close_window():
     window.destroy()
 
 def switchOn():
-    global switchedOnAppl
+    global switchedOnAppl, roomTitle, firstRoomItemsFull
     switchedOnAppl = switchedOnAppl + 1
+    firstRoomItemsFull[roomTitle] = firstRoomItemsFull[roomTitle] + 1
     update_bottom_text()
 
 def switchOff():
-    global switchedOnAppl
+    global switchedOnAppl, roomTitle, firstRoomItemsFull
     if(switchedOnAppl > 0): switchedOnAppl = switchedOnAppl - 1
+    if(firstRoomItemsFull[roomTitle] > 0): firstRoomItemsFull[roomTitle] = firstRoomItemsFull[roomTitle] - 1
     update_bottom_text()
 
 def update_top_text(new_text):
@@ -121,15 +125,16 @@ def reset_data():
     update_top_text('Main Menu')
     room = 1
     # 0 = top, 1 = left, 2 = right, 3 = bottom
-    set_top_data(gd.firstPageData[0])
-    set_right_data(gd.firstPageData[1])
-    set_bottom_data(gd.firstPageData[2])
-    set_left_data(gd.firstPageData[3])
+    set_top_data(firstRoomItemsArray[0])
+    set_right_data(firstRoomItemsArray[1])
+    set_bottom_data(firstRoomItemsArray[2])
+    set_left_data(firstRoomItemsArray[3])
     for counter, button in enumerate(buttons, start=0):
-        if(counter == 0 ): button.configure(text=gd.firstPageData[0])
-        if(counter == 2 ): button.configure(text=gd.firstPageData[1])
-        if(counter == 3 ): button.configure(text=gd.firstPageData[2])
-        if(counter == 1 ): button.configure(text=gd.firstPageData[3])
+        # if(counter == 0 ): button.configure(text=firstRoomItemsArray[counter])
+        # if(counter == 2 ): button.configure(text=firstRoomItemsArray[counter])
+        # if(counter == 3 ): button.configure(text=firstRoomItemsArray[counter])
+        # if(counter == 1 ): button.configure(text=firstRoomItemsArray[counter])
+        button.configure(text=f"{firstRoomItemsArray[counter]}: {firstRoomItemsFull[firstRoomItemsArray[counter]]}")
 
 def button_click(row, col):
     global data, secondRoomNames

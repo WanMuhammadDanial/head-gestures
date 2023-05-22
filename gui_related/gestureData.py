@@ -1,9 +1,9 @@
-firstPageData = [
-    'Living Room',
-    'Kitchen',
-    'Bedroom',
-    'Toilet'
-]
+firstPageData = {
+    'Living Room': 0,
+    'Kitchen': 0,
+    'Bedroom': 0,
+    'Toilet': 0
+}
 
 secondPageData = {
     'Living Room': {
