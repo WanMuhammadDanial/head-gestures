@@ -63,6 +63,7 @@ def storeCombo(gesture):
                 
     else:
         sentence.append(gesture)
+        sendActionToGui(gesture)
 
 def sendActionToGui(gesture):
     if(gesture == 'up'): 
