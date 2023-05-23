@@ -6,11 +6,13 @@ import mediapipe as mp
 import numpy as np
 import datetime
 import sys
+import threading
 
 sys.path.append('gui_related')
 import gestureGUI as gui
 
-#gui.start_GUI()
+
+exit_key='q'
 
 
 mp_holistic = mp.solutions.holistic
@@ -38,6 +40,27 @@ def extract_keypoints(results_key):
     face_key = np.array([[res_key.x, res_key.y, res_key.z] for res_key in results_key.face_landmarks.landmark]).flatten() \
         if results_key.face_landmarks else np.zeros(468*3)
     return np.concatenate([pose_key, face_key])
+
+def reset_combo():
+    global combo
+    combo = []
+
+def storeCombo(gesture):
+    global sentence
+    #avoid error
+    if(len(sentence) > 1):
+        #only store if previous isnt the same
+        if(gesture != sentence[len(sentence)-1]):
+            if((gesture== 'up' or gesture == 'down') and (sentence[len(sentence)-1] == 'up' or sentence[len(sentence)-1] == 'down')):
+                sentence.append('nod')
+                reset_combo()
+            elif ((gesture== 'right' or gesture == 'left') and (sentence[len(sentence)-1] == 'right' or sentence[len(sentence)-1] == 'left')):
+                sentence.append('shake')
+                reset_combo()
+            else:
+                sentence.append(gesture)
+    else:
+        sentence.append(gesture)
 
 
 # make sure to update this with another new dictionary(?) of color values every time you add a new gesture
@@ -83,95 +106,109 @@ arr_gesture = [0, 0, 0, 0, 0, 0, 0, 0]
 
 cap = cv2.VideoCapture(0)
 
+combo = []
+
 #set time per recorded gesture in seconds
 sensitivity = 0.0
 sensitivity_interval = 0.5
 starttime = datetime.datetime.utcnow()
 res = np.array([])
 
-with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
-    fuhpuhs = 0
-    while cap.isOpened():
+def gesture_start():
+    global sequence, sensitivity, sensitivity_interval, starttime, res, sentence, predictions, threshold, arr_name, arr_gesture,cap, model, actions, colors, combo
+    with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+        fuhpuhs = 0
+        while cap.isOpened():
 
-        # Read feed
-        ret, frame = cap.read()
+            # Read feed
+            ret, frame = cap.read()
 
-        # Make detections
-        image, results = mediapipe_detection(frame, holistic)
+            # Make detections
+            image, results = mediapipe_detection(frame, holistic)
 
-        # Draw landmarks
-        draw_landmarks(image, results)
+            # Draw landmarks
+            draw_landmarks(image, results)
 
-        # 2. Prediction logic
-        keypoints = extract_keypoints(results)
-        sequence.append(keypoints)
-        sequence = sequence[-15:]
-
-
-        if len(sequence) == 15:
-
-            if ((datetime.datetime.utcnow() - starttime).total_seconds() > sensitivity):
-                res = model.predict(np.expand_dims(sequence, axis=0))[0]
-                print(actions[np.argmax(res)])
-                # 3. Viz logic
-                if res[np.argmax(res)] > threshold:
-                    arr_index = 0
-                    for a in arr_name:
-                        if arr_name[arr_index] == actions[np.argmax(res)]:
-                            arr_gesture[arr_index] += 1
-                            break
-                        arr_index += 1
-
-                    arr_index = 0
-                    for a in arr_gesture:
-                        if a >= 10:
-                            if len(sentence) > 0:
-                                if actions[np.argmax(res)] != sentence[-1]:
-                                    sentence.append(actions[np.argmax(res)])
-                            else:
-                                sentence.append(actions[np.argmax(res)])
-
-                            arr_gesture = [0, 0, 0, 0, 0, 0, 0, 0]
-
-                            if len(sentence) > 5:
-                                sentence = sentence[-5:]
-
-                            break
-                        arr_index += 1
-                    starttime = datetime.datetime.utcnow()
+            # 2. Prediction logic
+            keypoints = extract_keypoints(results)
+            sequence.append(keypoints)
+            sequence = sequence[-15:]
 
 
+            if len(sequence) == 15:
 
-            # Viz probabilities
-            if res.size > 0:
-                image = prob_viz(res, actions, image, colors)
+                if ((datetime.datetime.utcnow() - starttime).total_seconds() > sensitivity):
+                    res = model.predict(np.expand_dims(sequence, axis=0))[0]
+                    print(actions[np.argmax(res)])
+                    # 3. Viz logic
+                    if res[np.argmax(res)] > threshold:
+                        arr_index = 0
+                        for a in arr_name:
+                            if arr_name[arr_index] == actions[np.argmax(res)]:
+                                arr_gesture[arr_index] += 1
+                                break
+                            arr_index += 1
+
+                        arr_index = 0
+                        for a in arr_gesture:
+                            if a >= 10:
+                                if len(sentence) > 0:
+                                    if actions[np.argmax(res)] != sentence[-1]:
+                                        #sentence.append(actions[np.argmax(res)])
+                                        storeCombo(actions[np.argmax(res)])
+                                else:
+                                    #sentence.append(actions[np.argmax(res)])
+                                    storeCombo(actions[np.argmax(res)])
+
+                                arr_gesture = [0, 0, 0, 0, 0, 0, 0, 0]
+
+                                if len(sentence) > 5:
+                                    sentence = sentence[-5:]
+
+                                break
+                            arr_index += 1
+                        starttime = datetime.datetime.utcnow()
 
 
-        cv2.rectangle(image, (0, 0), (640, 40), (245, 117, 16), -1)
-        cv2.putText(image, ', '.join(sentence), (3, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
-        cv2.putText(image, 'sensitivity: '+ str(sensitivity) + ' seconds', (3, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (57, 255, 20), 2, cv2.LINE_AA)
+                # Viz probabilities
+                if res.size > 0:
+                    image = prob_viz(res, actions, image, colors)
 
-        # Show on screen
-        cv2.imshow('OpenCV Feed', image)
 
-        #if ((datetime.datetime.utcnow() - starttime).total_seconds() > time_to_sleep):
-        #    starttime = datetime.datetime.utcnow()
+            cv2.rectangle(image, (0, 0), (640, 40), (245, 117, 16), -1)
+            cv2.putText(image, ', '.join(sentence), (3, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
-        pressedKey = cv2.waitKey(10) & 0xFF
-        if pressedKey == ord('w'):
-            sensitivity = sensitivity + sensitivity_interval
-            print('Sensitivity now at: ' + str(sensitivity) + ' seconds')
+            cv2.putText(image, 'sensitivity: '+ str(sensitivity) + ' seconds', (3, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (57, 255, 20), 2, cv2.LINE_AA)
 
-        elif pressedKey == ord('s'):
-            if sensitivity > 0:
-                sensitivity = sensitivity - sensitivity_interval
+            # Show on screen
+            cv2.imshow('OpenCV Feed', image)
+
+            #if ((datetime.datetime.utcnow() - starttime).total_seconds() > time_to_sleep):
+            #    starttime = datetime.datetime.utcnow()
+
+            pressedKey = cv2.waitKey(10) & 0xFF
+            if pressedKey == ord('w'):
+                sensitivity = sensitivity + sensitivity_interval
                 print('Sensitivity now at: ' + str(sensitivity) + ' seconds')
 
-        # Break using q key
-        elif pressedKey == ord('q'):
-            break
+            elif pressedKey == ord('s'):
+                if sensitivity > 0:
+                    sensitivity = sensitivity - sensitivity_interval
+                    print('Sensitivity now at: ' + str(sensitivity) + ' seconds')
+
+            # Break using q key
+            elif pressedKey == ord('q'):
+                break
 
 
-    cap.release()
-    cv2.destroyAllWindows()
+        cap.release()
+        cv2.destroyAllWindows()
+
+
+gui_thread = threading.Thread(target=gui.start_GUI)
+gesture_thread = threading.Thread(target=gesture_start)
+
+# gui_thread.start()
+gesture_thread.start()
+gui.start_GUI()
