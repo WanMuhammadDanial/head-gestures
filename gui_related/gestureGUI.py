@@ -216,5 +216,4 @@ top_text.grid(row=0, column=1)
 bottom_text = tk.Label(window,text= f'{totalOnAppliancesText}0', font=("Arial", 12), justify="center", anchor="center")
 bottom_text.grid(row=4, column=1)
 
-start_GUI()
 
