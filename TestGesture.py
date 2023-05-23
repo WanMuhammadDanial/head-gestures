@@ -59,9 +59,20 @@ def storeCombo(gesture):
                 reset_combo()
             else:
                 sentence.append(gesture)
+                sendActionToGui(gesture)
+                
     else:
         sentence.append(gesture)
 
+def sendActionToGui(gesture):
+    if(gesture == 'up'): 
+        gui.click_button_top()
+    if(gesture == 'right'): 
+        gui.click_button_right()
+    if(gesture == 'down'): 
+        gui.click_button_bottom()
+    if(gesture == 'left'): 
+        gui.click_button_left()
 
 # make sure to update this with another new dictionary(?) of color values every time you add a new gesture
 # not really necessary but its amusing

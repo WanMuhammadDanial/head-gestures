@@ -175,9 +175,20 @@ def button_click(row, col):
                 secondRoomNames[roomTitle][data[row][col]] = 'off'
                 update_button_status(row,col,data[row][col],secondRoomNames[roomTitle][data[row][col]])
                 switchOff()
+
+def click_button_top():
+    button_click(1,1)
+
+def click_button_right():
+    button_click(2,2)
+
+def click_button_bottom():
+    button_click(3,1)
+
+def click_button_left():
+    button_click(2,0)
                 
 def start_GUI():
-    print('starting GUI...')
     global window, buttons
     for i in range(5):
         window.grid_rowconfigure(i, minsize=10)  
